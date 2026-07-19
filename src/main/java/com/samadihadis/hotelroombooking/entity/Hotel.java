@@ -1,14 +1,13 @@
 package com.samadihadis.hotelroombooking.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Setter
@@ -30,5 +29,8 @@ public class Hotel {
 
     @Max(value = 5)
     private Integer starRating;
+
+    @OneToMany(mappedBy = "hotel")
+    private List<Room> rooms;
 
 }

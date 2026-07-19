@@ -7,16 +7,16 @@ import java.util.List;
 
 public interface HotelRepository extends JpaRepository<Hotel, Long> {
 
-    List<Hotel> findByRate(Integer rate);
+    List<Hotel> findHotelsByRate(Integer rate);
 
-    List<Hotel> findByStarRate(Integer starRating);
+    List<Hotel> findHotelsByStarRating(Integer starRating);
 
     // جستجوی هتل‌ها با امتیاز بالاتر از مقدار مشخص
-    List<Hotel> findByRateGreaterThanEqual(Integer rate);
+    List<Hotel> findHotelsByRateGreaterThanEqual(Integer rate);
 
     // جستجو بر اساس نام (برای سرچ)
-    List<Hotel> findByNameContainingIgnoreCase(String name);
+    List<Hotel> findHotelsByNameContainingIgnoreCase(String name);
 
     // جستجوی ترکیبی
-    List<Hotel> findByStarRatingAndRateGreaterThanEqual(Integer starRating, Integer rate);
+    List<Hotel> findHotelsByStarRatingAndRateGreaterThanEqual(Integer starRating, Integer rate);
 }

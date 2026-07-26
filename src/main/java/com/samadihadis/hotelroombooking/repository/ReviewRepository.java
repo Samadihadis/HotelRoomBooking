@@ -19,4 +19,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     // محاسبه میانگین امتیاز یک هتل
     @Query("SELECT AVG(r.rate) FROM Review r WHERE r.hotel.id = :hotelId")
     Double getAverageRateByHotelId(@Param("hotelId") Long hotelId);
+
+    boolean existsByUserIdAndHotelId(Long userId, Long hotelId);
 }

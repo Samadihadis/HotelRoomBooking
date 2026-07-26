@@ -19,7 +19,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     // رزروهای یک اتاق خاص
     List<Booking> findByRoomId(Long roomId);
 
-    // چک کردن تداخل تاریخ برای یک اتاق (حیاتی!)
+    // چک کردن تداخل تاریخ برای یک اتاق
     @Query("SELECT b FROM Booking b WHERE b.room.id = :roomId " +
             "AND b.bookingState != 'CANCELLED' " +
             "AND ((b.checkinDate <= :checkoutDate AND b.checkoutDate >= :checkinDate))")

@@ -198,6 +198,13 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
+    @Transactional
+    public Booking updateBookingState(Long bookingId, BookingState newState) {
+        Booking booking = findBookingById(bookingId);
+        booking.setBookingState(newState);
+        return bookingRepository.save(booking);
+    }
+
     private void validateBooking(Booking booking) {
 
         if (booking.getCheckinDate() == null || booking.getCheckoutDate() == null) {

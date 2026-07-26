@@ -22,4 +22,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     // پرداخت‌های موفق یک کاربر (از طریق Booking)
     @Query("SELECT p FROM Payment p WHERE p.booking.user.id = :userId AND p.paymentState = 'SUCCESS'")
     List<Payment> findSuccessfulPaymentsByUserId(@Param("userId") Long userId);
+
+    boolean existsByBookingId(Long bookingId);
 }

@@ -98,15 +98,15 @@ public class BookingService {
         bookingRepository.deleteById(id);
     }
 
-    public List<Booking> getBookingByState(BookingState bookingState) {
+    public List<Booking> findBookingsByState(BookingState bookingState) {
         return bookingRepository.findByBookingState(bookingState);
     }
 
-    public List<Booking> findBookingByUserId(Long userId) {
+    public List<Booking> findBookingsByUserId(Long userId) {
         return bookingRepository.findByUserId(userId);
     }
 
-    public List<Booking> findBookingByRoomId(Long roomId) {
+    public List<Booking> findBookingsByRoomId(Long roomId) {
         return bookingRepository.findByRoomId(roomId);
     }
 

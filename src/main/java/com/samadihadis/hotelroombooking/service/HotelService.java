@@ -26,7 +26,7 @@ public class HotelService {
         return hotelRepository.save(hotel);
     }
 
-    public List<Hotel> getAllHotel() {
+    public List<Hotel> getAllHotels() {
         return hotelRepository.findAll();
     }
 
@@ -37,11 +37,11 @@ public class HotelService {
                 ));
     }
 
-    public List<Hotel> getHotelByRate(Integer rate) {
+    public List<Hotel> getHotelsByRate(Integer rate) {
         return hotelRepository.findHotelsByRate(rate);
     }
 
-    public List<Hotel> getHotelByStarRating(Integer starRating) {
+    public List<Hotel> getHotelsByStarRating(Integer starRating) {
         return hotelRepository.findHotelsByStarRating(starRating);
     }
 
@@ -63,6 +63,7 @@ public class HotelService {
         if (hotel.getRooms() != null && !hotel.getRooms().isEmpty()) {
             throw new RuntimeException("هتل دارای اتاق است و نمی‌توان آن را حذف کرد.");
         }
+        hotelRepository.deleteById(id);
     }
 
     @Transactional

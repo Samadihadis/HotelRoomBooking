@@ -35,7 +35,7 @@ public class RoomService {
     }
 
 
-    public List<Room> getAllRoom() {
+    public List<Room> getAllRooms() {
         return roomRepository.findAll();
     }
 
@@ -46,11 +46,11 @@ public class RoomService {
                 ));
     }
 
-    public List<Room> getRoomByType(RoomType roomType) {
+    public List<Room> getRoomsByType(RoomType roomType) {
         return roomRepository.findByRoomType(roomType);
     }
 
-    public List<Room> getRoomByState(RoomState roomState) {
+    public List<Room> getRoomsByState(RoomState roomState) {
         return roomRepository.findByRoomState(roomState);
     }
 
@@ -65,14 +65,14 @@ public class RoomService {
                 ));
     }
 
-    public List<Room> getByHotelIdAndRoomState(Long hotelId, RoomState roomState) {
+    public List<Room> getRoomsByHotelIdAndRoomState(Long hotelId, RoomState roomState) {
         if (hotelId == null) {
             throw new RuntimeException("شماره هتل نمی‌تواند خالی باشد.");
         }
         return roomRepository.findByHotelIdAndRoomState(hotelId, roomState);
     }
 
-    public List<Room> getByMaxCapacityGreaterThanEqualAndRoomState(Integer capacity, RoomState roomState) {
+    public List<Room> getRoomsByMaxCapacityGreaterThanEqualAndRoomState(Integer capacity, RoomState roomState) {
         return roomRepository.findByMaxCapacityGreaterThanEqualAndRoomState(capacity, roomState);
     }
 

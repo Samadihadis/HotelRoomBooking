@@ -37,7 +37,7 @@ public class ReviewService {
      return reviewRepository.findAll();
     }
 
-    public Review getReviewById(Long id) {
+    public Review findReviewById(Long id) {
         return reviewRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException(
                         String.format("نظر با شناسه %d یافت نشد.", id)
@@ -46,7 +46,7 @@ public class ReviewService {
 
     @Transactional
     public void deleteReview(Long reviewId) {
-        getReviewById(reviewId);
+        findReviewById(reviewId);
         reviewRepository.deleteById(reviewId);
     }
 
@@ -66,7 +66,7 @@ public class ReviewService {
         return reviewRepository.findByUserId(userId);
     }
 
-    public Double getAverageRateByHotelId(Long hotelId) {  // ✅ اضافه شد
+    public Double getAverageRateByHotelId(Long hotelId) {
         if (hotelId == null) {
             throw new RuntimeException("شناسه هتل نمی‌تواند خالی باشد.");
         }
@@ -76,7 +76,7 @@ public class ReviewService {
 
     @Transactional
     public Review updateReview(Long reviewId, Review updatedReview) {
-        Review existingReview = getReviewById(reviewId);
+        Review existingReview = findReviewById(reviewId);
 
         if (updatedReview.getRate() != null) {
             if (updatedReview.getRate() < 1 || updatedReview.getRate() > 5) {

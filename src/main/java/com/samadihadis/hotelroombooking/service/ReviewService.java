@@ -23,7 +23,7 @@ public class ReviewService {
     public Review createReview (Review review) {
         validateReview(review);
 
-        User user = userService.getUserById(review.getUser().getId());
+        User user = userService.findUserById(review.getUser().getId());
         Hotel hotel = hotelService.getHotelById(review.getHotel().getId());
 
         if (reviewRepository.existsByUserIdAndHotelId(user.getId(), hotel.getId())) {
@@ -62,7 +62,7 @@ public class ReviewService {
         if (userId == null) {
             throw new RuntimeException("شناسه کاربر نمی‌تواند خالی باشد.");
         }
-        userService.getUserById(userId);
+        userService.findUserById(userId);
         return reviewRepository.findByUserId(userId);
     }
 

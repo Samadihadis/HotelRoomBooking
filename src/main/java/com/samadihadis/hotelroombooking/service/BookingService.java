@@ -30,7 +30,7 @@ public class BookingService {
         validateBooking(booking);
 
         Room room = roomService.getRoomById(booking.getRoom().getId());
-        User user = userService.getUserById(booking.getUser().getId());
+        User user = userService.findUserById(booking.getUser().getId());
 
         if (room.getRoomState() != RoomState.AVAILABLE) {
             throw new RuntimeException("اتاق مورد نظر در حال حاضر قابل رزرو نیست.");

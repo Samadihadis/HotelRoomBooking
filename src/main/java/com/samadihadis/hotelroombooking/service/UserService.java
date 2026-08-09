@@ -31,7 +31,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User getUserById(Long id) {
+    public User findUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException(
                         String.format("کاربر با شناسه %d یافت نشد.", id)
@@ -70,7 +70,7 @@ public class UserService {
 
     @Transactional
     public User updateUser(Long id, User updatedUser) {
-        User existingUser = getUserById(id);
+        User existingUser = findUserById(id);
 
         if (updatedUser.getFullName() != null && !updatedUser.getFullName().trim().isEmpty()) {
             existingUser.setFullName(updatedUser.getFullName());
@@ -85,7 +85,7 @@ public class UserService {
 
     @Transactional
     public User changeUserState(Long userId, UserState newState) {
-        User user = getUserById(userId);
+        User user = findUserById(userId);
 
         if (user.getUserRole() == UserRole.ADMIN && newState == UserState.INACTIVE) {
             long adminCount = userRepository.findByUserState(UserState.ACTIVE)
@@ -104,7 +104,7 @@ public class UserService {
 
     @Transactional
     public User changeUserRole(Long userId, UserRole newRole) {
-        User user = getUserById(userId);
+        User user = findUserById(userId);
 
         user.setUserRole(newRole);
         return userRepository.save(user);
@@ -112,7 +112,7 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Long id) {
-        User user = getUserById(id);
+        User user = findUserById(id);
 
         if (user.getUserRole() == UserRole.ADMIN) {
             long adminCount = userRepository.findByUserState(UserState.ACTIVE)
@@ -133,7 +133,7 @@ public class UserService {
         if (keyword == null || keyword.trim().isEmpty()) {
             return getAllUsers();
         }
-        return null;
+        return userRepository.findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase(keyword, keyword);
     }
 
     @Transactional(readOnly = true)

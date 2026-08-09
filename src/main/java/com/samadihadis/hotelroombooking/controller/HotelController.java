@@ -2,7 +2,6 @@ package com.samadihadis.hotelroombooking.controller;
 
 
 import com.samadihadis.hotelroombooking.entity.Hotel;
-import com.samadihadis.hotelroombooking.entity.Room;
 import com.samadihadis.hotelroombooking.service.HotelService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

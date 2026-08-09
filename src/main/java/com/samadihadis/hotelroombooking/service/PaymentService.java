@@ -5,7 +5,6 @@ import com.samadihadis.hotelroombooking.entity.Payment;
 import com.samadihadis.hotelroombooking.enumes.BookingState;
 import com.samadihadis.hotelroombooking.enumes.PaymentMethod;
 import com.samadihadis.hotelroombooking.enumes.PaymentState;
-import com.samadihadis.hotelroombooking.repository.BookingRepository;
 import com.samadihadis.hotelroombooking.repository.PaymentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ import java.util.List;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final BookingRepository bookingRepository;
     private final BookingService bookingService;
 
     @Transactional
@@ -49,7 +47,7 @@ public class PaymentService {
         return savedPayment;
     }
 
-    public Payment getPaymentById(Long id) {
+    public Payment findPaymentById(Long id) {
         return paymentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException(
                         String.format("پرداخت با شناسه %d یافت نشد.", id)
@@ -62,7 +60,7 @@ public class PaymentService {
 
     @Transactional
     public void deletePayment(Long id) {
-        Payment payment = getPaymentById(id);
+        Payment payment = findPaymentById(id);
 
         if (payment.getPaymentState() == PaymentState.SUCCESS) {
             throw new RuntimeException("امکان حذف پرداخت‌های موفق وجود ندارد.");
@@ -103,7 +101,7 @@ public class PaymentService {
 
     @Transactional
     public Payment updatePaymentState(Long paymentId, PaymentState newState) {
-        Payment payment = getPaymentById(paymentId);
+        Payment payment = findPaymentById(paymentId);
 
         if (payment.getPaymentState() == PaymentState.SUCCESS) {
             throw new RuntimeException("پرداخت موفق قابل تغییر نیست.");
@@ -112,14 +110,7 @@ public class PaymentService {
         payment.setPaymentState(newState);
 
         if (newState == PaymentState.SUCCESS) {
-            Booking booking = payment.getBooking();
-             booking.setBookingState(BookingState.CONFIRMED);
-        }
-
-        if (newState == PaymentState.SUCCESS) {
-            Booking booking = payment.getBooking();
-            booking.setBookingState(BookingState.CONFIRMED);
-            bookingRepository.save(booking);
+            bookingService.updateBookingState(payment.getBooking().getId(), BookingState.CONFIRMED);
         }
 
         return paymentRepository.save(payment);

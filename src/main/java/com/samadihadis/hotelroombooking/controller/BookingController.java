@@ -86,7 +86,7 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.checkOut(id));
     }
 
-    @PutMapping("{id}/{checkin}/{checkout}")
+    @PutMapping("/{id}/{checkin}/{checkout}")
     public ResponseEntity<Booking> updateBooking(@PathVariable Long bookingId,
                                                                  @PathVariable LocalDate checkinDate,
                                                                  @PathVariable LocalDate checkoutDate){

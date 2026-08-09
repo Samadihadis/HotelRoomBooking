@@ -61,7 +61,7 @@ public class HotelController {
         );
     }
 
-    @PutMapping("{/id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Hotel> updateHotel (@PathVariable Long id , @Valid@RequestBody Hotel hotel){
         return ResponseEntity.ok(hotelService.updateHotel(id, hotel));
     }

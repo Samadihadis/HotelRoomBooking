@@ -1,7 +1,8 @@
 package com.samadihadis.hotelroombooking.controller;
 
-
-import com.samadihadis.hotelroombooking.entity.Review;
+import com.samadihadis.hotelroombooking.dto.ReviewCreateRequest;
+import com.samadihadis.hotelroombooking.dto.ReviewResponse;
+import com.samadihadis.hotelroombooking.dto.ReviewUpdateRequest;
 import com.samadihadis.hotelroombooking.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,17 +19,17 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    public ResponseEntity<Review> createReview(@Valid @RequestBody Review review){
-        return ResponseEntity.ok(reviewService.createReview(review));
+    public ResponseEntity<ReviewResponse> createReview(@Valid @RequestBody ReviewCreateRequest request) {
+        return ResponseEntity.ok(reviewService.createReview(request));
     }
 
     @GetMapping
-    public ResponseEntity<List<Review>> getAllReviews(){
+    public ResponseEntity<List<ReviewResponse>> getAllReviews() {
         return ResponseEntity.ok(reviewService.getAllReviews());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Review> getReviewById(@PathVariable Long id){
+    public ResponseEntity<ReviewResponse> getReviewById(@PathVariable Long id) {
         return ResponseEntity.ok(reviewService.findReviewById(id));
     }
 
@@ -41,24 +42,24 @@ public class ReviewController {
     }
 
     @GetMapping("/hotel-id/{hotelId}/reviews")
-    public ResponseEntity<List<Review>> getReviewsByHotelId(@PathVariable Long hotelId){
+    public ResponseEntity<List<ReviewResponse>> getReviewsByHotelId(@PathVariable Long hotelId) {
         return ResponseEntity.ok(reviewService.getReviewsByHotelId(hotelId));
     }
 
     @GetMapping("/user-id/{userId}")
-    public ResponseEntity<List<Review>> getReviewsByUserId(@PathVariable Long userId){
+    public ResponseEntity<List<ReviewResponse>> getReviewsByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(reviewService.getReviewsByUserId(userId));
     }
 
-    @GetMapping("/hotel-id/{hotelId}/average-rat")
-    public ResponseEntity<Double> getAverageRateByHotelId(@PathVariable Long hotelId){
+    @GetMapping("/hotel-id/{hotelId}/average-rate")
+    public ResponseEntity<Double> getAverageRateByHotelId(@PathVariable Long hotelId) {
         return ResponseEntity.ok(reviewService.getAverageRateByHotelId(hotelId));
     }
 
     @PutMapping("/{reviewId}")
-    public ResponseEntity<Review> updateReview(@PathVariable Long reviewId,
-                                                          @RequestBody Review updatedReview){
-        return ResponseEntity.ok(reviewService.updateReview(reviewId,updatedReview));
+    public ResponseEntity<ReviewResponse> updateReview(
+            @PathVariable Long reviewId,
+            @Valid @RequestBody ReviewUpdateRequest request) {
+        return ResponseEntity.ok(reviewService.updateReview(reviewId, request));
     }
-
 }

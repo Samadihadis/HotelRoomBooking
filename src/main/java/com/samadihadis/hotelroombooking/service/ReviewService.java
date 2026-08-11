@@ -1,12 +1,18 @@
 package com.samadihadis.hotelroombooking.service;
 
+import com.samadihadis.hotelroombooking.dto.ReviewCreateRequest;
+import com.samadihadis.hotelroombooking.dto.ReviewResponse;
+import com.samadihadis.hotelroombooking.dto.ReviewUpdateRequest;
 import com.samadihadis.hotelroombooking.entity.Hotel;
 import com.samadihadis.hotelroombooking.entity.Review;
 import com.samadihadis.hotelroombooking.entity.User;
+import com.samadihadis.hotelroombooking.mapper.ReviewMapper;
+import com.samadihadis.hotelroombooking.repository.HotelRepository;
 import com.samadihadis.hotelroombooking.repository.ReviewRepository;
-import jakarta.transaction.Transactional;
+import com.samadihadis.hotelroombooking.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,101 +22,122 @@ import java.util.List;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final UserService userService;
-    private final HotelService hotelService;
+    private final UserRepository userRepository;
+    private final HotelRepository hotelRepository;
+    private final ReviewMapper reviewMapper;
 
     @Transactional
-    public Review createReview (Review review) {
-        validateReview(review);
+    public ReviewResponse createReview(ReviewCreateRequest request) {
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException(
+                        String.format("کاربر با شناسه %d یافت نشد.", request.getUserId())
+                ));
 
-        User user = userService.findUserById(review.getUser().getId());
-        Hotel hotel = hotelService.getHotelById(review.getHotel().getId());
+        Hotel hotel = hotelRepository.findById(request.getHotelId())
+                .orElseThrow(() -> new RuntimeException(
+                        String.format("هتل با شناسه %d یافت نشد.", request.getHotelId())
+                ));
 
         if (reviewRepository.existsByUserIdAndHotelId(user.getId(), hotel.getId())) {
             throw new RuntimeException("شما قبلاً برای این هتل نظر داده‌اید.");
         }
+
+        Review review = reviewMapper.toEntity(request);
+        review.setUser(user);
+        review.setHotel(hotel);
         review.setCreateAt(LocalDate.now());
-        return reviewRepository.save(review);
+
+        Review saved = reviewRepository.save(review);
+        return reviewMapper.toResponse(saved);
     }
 
-    public List<Review> getAllReviews() {
-     return reviewRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<ReviewResponse> getAllReviews() {
+        return reviewRepository.findAll()
+                .stream()
+                .map(reviewMapper::toResponse)
+                .toList();
     }
 
-    public Review findReviewById(Long id) {
-        return reviewRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(
-                        String.format("نظر با شناسه %d یافت نشد.", id)
-                ));
+    @Transactional(readOnly = true)
+    public ReviewResponse findReviewById(Long id) {
+        return reviewMapper.toResponse(findReviewEntityById(id));
     }
 
     @Transactional
     public void deleteReview(Long reviewId) {
-        findReviewById(reviewId);
+        findReviewEntityById(reviewId);
         reviewRepository.deleteById(reviewId);
     }
 
-    public List<Review> getReviewsByHotelId(Long hotelId) {
+    @Transactional(readOnly = true)
+    public List<ReviewResponse> getReviewsByHotelId(Long hotelId) {
         if (hotelId == null) {
             throw new RuntimeException("شناسه هتل نمی‌تواند خالی باشد.");
         }
-        hotelService.getHotelById(hotelId);
-        return reviewRepository.findByHotelId(hotelId);
+        // اطمینان از وجود هتل
+        hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new RuntimeException(
+                        String.format("هتل با شناسه %d یافت نشد.", hotelId)
+                ));
+
+        return reviewRepository.findByHotelId(hotelId)
+                .stream()
+                .map(reviewMapper::toResponse)
+                .toList();
     }
 
-    public List<Review> getReviewsByUserId(Long userId) {
+    @Transactional(readOnly = true)
+    public List<ReviewResponse> getReviewsByUserId(Long userId) {
         if (userId == null) {
             throw new RuntimeException("شناسه کاربر نمی‌تواند خالی باشد.");
         }
-        userService.findUserById(userId);
-        return reviewRepository.findByUserId(userId);
+        userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException(
+                        String.format("کاربر با شناسه %d یافت نشد.", userId)
+                ));
+
+        return reviewRepository.findByUserId(userId)
+                .stream()
+                .map(reviewMapper::toResponse)
+                .toList();
     }
 
+    @Transactional(readOnly = true)
     public Double getAverageRateByHotelId(Long hotelId) {
         if (hotelId == null) {
             throw new RuntimeException("شناسه هتل نمی‌تواند خالی باشد.");
         }
-        hotelService.getHotelById(hotelId);
-        return reviewRepository.getAverageRateByHotelId(hotelId);
+        hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new RuntimeException(
+                        String.format("هتل با شناسه %d یافت نشد.", hotelId)
+                ));
+
+        Double average = reviewRepository.getAverageRateByHotelId(hotelId);
+        return average != null ? average : 0.0;
     }
 
     @Transactional
-    public Review updateReview(Long reviewId, Review updatedReview) {
-        Review existingReview = findReviewById(reviewId);
+    public ReviewResponse updateReview(Long reviewId, ReviewUpdateRequest request) {
+        Review existingReview = findReviewEntityById(reviewId);
 
-        if (updatedReview.getRate() != null) {
-            if (updatedReview.getRate() < 1 || updatedReview.getRate() > 5) {
-                throw new RuntimeException("امتیاز باید بین 1 تا 5 باشد.");
-            }
-            existingReview.setRate(updatedReview.getRate());
+        reviewMapper.updateEntityFromRequest(request, existingReview);
+
+        // اعتبارسنجی امتیاز بعد از آپدیت
+        if (existingReview.getRate() != null &&
+                (existingReview.getRate() < 1 || existingReview.getRate() > 5)) {
+            throw new RuntimeException("امتیاز باید بین ۱ تا ۵ باشد.");
         }
 
-        if (updatedReview.getComment() != null && !updatedReview.getComment().trim().isEmpty()) {
-            existingReview.setComment(updatedReview.getComment());
-        }
-
-        return reviewRepository.save(existingReview);
+        Review updated = reviewRepository.save(existingReview);
+        return reviewMapper.toResponse(updated);
     }
 
-    private void validateReview(Review review) {
-        if (review.getUser() == null || review.getUser().getId() == null) {
-            throw new RuntimeException("شناسه کاربر الزامی است.");
-        }
-
-        if (review.getHotel() == null || review.getHotel().getId() == null) {
-            throw new RuntimeException("شناسه هتل الزامی است.");
-        }
-
-        if (review.getRate() == null) {
-            throw new RuntimeException("امتیاز نمی‌تواند خالی باشد.");
-        }
-
-        if (review.getRate() < 1 || review.getRate() > 5) {
-            throw new RuntimeException("امتیاز باید بین 1 تا 5 باشد.");
-        }
-
-        if (review.getComment() == null || review.getComment().trim().isEmpty()) {
-            throw new RuntimeException("متن نظر نمی‌تواند خالی باشد.");
-        }
+    // ---------- متد کمکی ----------
+    private Review findReviewEntityById(Long id) {
+        return reviewRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(
+                        String.format("نظر با شناسه %d یافت نشد.", id)
+                ));
     }
 }

@@ -1,16 +1,19 @@
 package com.samadihadis.hotelroombooking.service;
 
+import com.samadihadis.hotelroombooking.dto.paymentdto.PaymentCreateRequest;
+import com.samadihadis.hotelroombooking.dto.paymentdto.PaymentResponse;
 import com.samadihadis.hotelroombooking.entity.Booking;
 import com.samadihadis.hotelroombooking.entity.Payment;
 import com.samadihadis.hotelroombooking.enumes.BookingState;
 import com.samadihadis.hotelroombooking.enumes.PaymentMethod;
 import com.samadihadis.hotelroombooking.enumes.PaymentState;
+import com.samadihadis.hotelroombooking.mapper.PaymentMapper;
+import com.samadihadis.hotelroombooking.repository.BookingRepository;
 import com.samadihadis.hotelroombooking.repository.PaymentRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -19,14 +22,16 @@ import java.util.List;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final BookingRepository bookingRepository;
+    private final PaymentMapper paymentMapper;
     private final BookingService bookingService;
 
     @Transactional
-    public Payment createPayment(Payment payment) {
-
-        validatePayment(payment);
-
-        Booking booking = bookingService.findBookingById(payment.getBooking().getId());
+    public PaymentResponse createPayment(PaymentCreateRequest request) {
+        Booking booking = bookingRepository.findById(request.getBookingId())
+                .orElseThrow(() -> new RuntimeException(
+                        String.format("رزرو با شناسه %d یافت نشد.", request.getBookingId())
+                ));
 
         if (booking.getBookingState() != BookingState.PENDING) {
             throw new RuntimeException("فقط رزروهای در انتظار قابلیت پرداخت دارند.");
@@ -36,31 +41,35 @@ public class PaymentService {
             throw new RuntimeException("برای این رزرو قبلاً پرداختی ثبت شده است.");
         }
 
+        Payment payment = paymentMapper.toEntity(request);
+        payment.setBooking(booking);
         payment.setPaymentDate(LocalDate.now());
+
         Payment savedPayment = paymentRepository.save(payment);
 
         if (savedPayment.getPaymentState() == PaymentState.SUCCESS) {
-            Booking newBooking = savedPayment.getBooking();
-            newBooking.setBookingState(BookingState.CONFIRMED);
-            bookingService.updateBookingState(newBooking.getId(), BookingState.CONFIRMED);
+            bookingService.updateBookingState(booking.getId(), BookingState.CONFIRMED);
         }
-        return savedPayment;
+
+        return paymentMapper.toResponse(savedPayment);
     }
 
-    public Payment findPaymentById(Long id) {
-        return paymentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(
-                        String.format("پرداخت با شناسه %d یافت نشد.", id)
-                ));
+    @Transactional(readOnly = true)
+    public PaymentResponse findPaymentById(Long id) {
+        return paymentMapper.toResponse(findPaymentEntityById(id));
     }
 
-    public List<Payment> getAllPayments() {
-        return paymentRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<PaymentResponse> getAllPayments() {
+        return paymentRepository.findAll()
+                .stream()
+                .map(paymentMapper::toResponse)
+                .toList();
     }
 
     @Transactional
     public void deletePayment(Long id) {
-        Payment payment = findPaymentById(id);
+        Payment payment = findPaymentEntityById(id);
 
         if (payment.getPaymentState() == PaymentState.SUCCESS) {
             throw new RuntimeException("امکان حذف پرداخت‌های موفق وجود ندارد.");
@@ -68,40 +77,54 @@ public class PaymentService {
         paymentRepository.deleteById(id);
     }
 
-    public List<Payment> getPaymentByState(PaymentState paymentState) {
+    @Transactional(readOnly = true)
+    public List<PaymentResponse> getPaymentByState(PaymentState paymentState) {
         if (paymentState == null) {
             throw new RuntimeException("وضعیت پرداخت نمی‌تواند خالی باشد.");
         }
-        return paymentRepository.findByPaymentState(paymentState);
+        return paymentRepository.findByPaymentState(paymentState)
+                .stream()
+                .map(paymentMapper::toResponse)
+                .toList();
     }
 
-    public List<Payment> getPaymentByMethod(PaymentMethod paymentMethod) {
+    @Transactional(readOnly = true)
+    public List<PaymentResponse> getPaymentByMethod(PaymentMethod paymentMethod) {
         if (paymentMethod == null) {
             throw new RuntimeException("روش پرداخت نمی‌تواند خالی باشد.");
         }
-        return paymentRepository.findByPaymentMethod(paymentMethod);
+        return paymentRepository.findByPaymentMethod(paymentMethod)
+                .stream()
+                .map(paymentMapper::toResponse)
+                .toList();
     }
 
-    public Payment getPaymentByBookingId(Long bookingId) {
+    @Transactional(readOnly = true)
+    public PaymentResponse getPaymentByBookingId(Long bookingId) {
         if (bookingId == null) {
             throw new RuntimeException("شناسه رزرو نمی‌تواند خالی باشد.");
         }
-        return paymentRepository.findByBookingId(bookingId)
+        Payment payment = paymentRepository.findByBookingId(bookingId)
                 .orElseThrow(() -> new RuntimeException(
-                        String.format("پرداختی برای رزرو با شناسه %d یافت نشد.", bookingId)));
+                        String.format("پرداختی برای رزرو با شناسه %d یافت نشد.", bookingId)
+                ));
+        return paymentMapper.toResponse(payment);
     }
 
-    public List<Payment> getSuccessfulPaymentsByUserId(Long userId) {
-
+    @Transactional(readOnly = true)
+    public List<PaymentResponse> getSuccessfulPaymentsByUserId(Long userId) {
         if (userId == null) {
-            throw new RuntimeException("کاربر یافت نشد.");
+            throw new RuntimeException("شناسه کاربر نمی‌تواند خالی باشد.");
         }
-        return paymentRepository.findSuccessfulPaymentsByUserId(userId);
+        return paymentRepository.findSuccessfulPaymentsByUserId(userId)
+                .stream()
+                .map(paymentMapper::toResponse)
+                .toList();
     }
 
     @Transactional
-    public Payment updatePaymentState(Long paymentId, PaymentState newState) {
-        Payment payment = findPaymentById(paymentId);
+    public PaymentResponse updatePaymentState(Long paymentId, PaymentState newState) {
+        Payment payment = findPaymentEntityById(paymentId);
 
         if (payment.getPaymentState() == PaymentState.SUCCESS) {
             throw new RuntimeException("پرداخت موفق قابل تغییر نیست.");
@@ -113,28 +136,14 @@ public class PaymentService {
             bookingService.updateBookingState(payment.getBooking().getId(), BookingState.CONFIRMED);
         }
 
-        return paymentRepository.save(payment);
+        Payment updated = paymentRepository.save(payment);
+        return paymentMapper.toResponse(updated);
     }
 
-    private void validatePayment(Payment payment) {
-        if (payment.getBooking() == null || payment.getBooking().getId() == null) {
-            throw new RuntimeException("شناسه رزرو الزامی است.");
-        }
-
-        if (payment.getAmount() == null) {
-            throw new RuntimeException("مبلغ پرداخت نمی‌تواند خالی باشد.");
-        }
-
-        if (payment.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("مبلغ پرداخت باید بیشتر از صفر باشد.");
-        }
-
-        if (payment.getPaymentMethod() == null) {
-            throw new RuntimeException("روش پرداخت نمی‌تواند خالی باشد.");
-        }
-
-        if (payment.getPaymentState() == null) {
-            throw new RuntimeException("وضعیت پرداخت نمی‌تواند خالی باشد.");
-        }
+    private Payment findPaymentEntityById(Long id) {
+        return paymentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(
+                        String.format("پرداخت با شناسه %d یافت نشد.", id)
+                ));
     }
 }

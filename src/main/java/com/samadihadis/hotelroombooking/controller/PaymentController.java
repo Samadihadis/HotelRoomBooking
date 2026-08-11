@@ -1,6 +1,8 @@
 package com.samadihadis.hotelroombooking.controller;
 
-import com.samadihadis.hotelroombooking.entity.Payment;
+
+import com.samadihadis.hotelroombooking.dto.paymentdto.PaymentCreateRequest;
+import com.samadihadis.hotelroombooking.dto.paymentdto.PaymentResponse;
 import com.samadihadis.hotelroombooking.enumes.PaymentMethod;
 import com.samadihadis.hotelroombooking.enumes.PaymentState;
 import com.samadihadis.hotelroombooking.service.PaymentService;
@@ -20,18 +22,18 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping
-    public ResponseEntity<Payment> createPayment(@Valid @RequestBody Payment payment) {
-        Payment createdPayment = paymentService.createPayment(payment);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdPayment);
+    public ResponseEntity<PaymentResponse> createPayment(@Valid @RequestBody PaymentCreateRequest request) {
+        PaymentResponse created = paymentService.createPayment(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Payment> getPaymentById(@PathVariable Long id) {
+    public ResponseEntity<PaymentResponse> getPaymentById(@PathVariable Long id) {
         return ResponseEntity.ok(paymentService.findPaymentById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<Payment>> getAllPayments() {
+    public ResponseEntity<List<PaymentResponse>> getAllPayments() {
         return ResponseEntity.ok(paymentService.getAllPayments());
     }
 
@@ -44,31 +46,29 @@ public class PaymentController {
     }
 
     @GetMapping("/state/{paymentState}")
-    public ResponseEntity<List<Payment>> getPaymentByState(@PathVariable PaymentState paymentState) {
+    public ResponseEntity<List<PaymentResponse>> getPaymentByState(@PathVariable PaymentState paymentState) {
         return ResponseEntity.ok(paymentService.getPaymentByState(paymentState));
     }
 
     @GetMapping("/method/{paymentMethod}")
-    public ResponseEntity<List<Payment>> getPaymentByMethod(@PathVariable PaymentMethod paymentMethod) {
+    public ResponseEntity<List<PaymentResponse>> getPaymentByMethod(@PathVariable PaymentMethod paymentMethod) {
         return ResponseEntity.ok(paymentService.getPaymentByMethod(paymentMethod));
     }
 
     @GetMapping("/booking-id/{bookingId}")
-    public ResponseEntity<Payment> getPaymentByBookingId(@PathVariable Long bookingId){
+    public ResponseEntity<PaymentResponse> getPaymentByBookingId(@PathVariable Long bookingId) {
         return ResponseEntity.ok(paymentService.getPaymentByBookingId(bookingId));
     }
 
     @GetMapping("/user-id/{userId}")
-    public ResponseEntity<List<Payment>> getSuccessfulPaymentsByUserId(@PathVariable Long userId){
+    public ResponseEntity<List<PaymentResponse>> getSuccessfulPaymentsByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(paymentService.getSuccessfulPaymentsByUserId(userId));
     }
 
     @PatchMapping("/{id}/state")
-    public ResponseEntity<Payment> updatePaymentState(
+    public ResponseEntity<PaymentResponse> updatePaymentState(
             @PathVariable Long id,
             @RequestParam PaymentState newState) {
         return ResponseEntity.ok(paymentService.updatePaymentState(id, newState));
     }
-
 }
-

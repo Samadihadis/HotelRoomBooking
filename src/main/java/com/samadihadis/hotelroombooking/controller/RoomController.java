@@ -34,12 +34,12 @@ public class RoomController {
         return ResponseEntity.ok(roomService.getRoomById(id));
     }
 
-    @GetMapping("/type/{type}")
+    @GetMapping("/type/{roomType}")
     public ResponseEntity<List<Room>> getRoomByType(@PathVariable RoomType roomType) {
         return ResponseEntity.ok(roomService.getRoomsByType(roomType));
     }
 
-    @GetMapping("/state/{state}")
+    @GetMapping("/state/{roomState}")
     public ResponseEntity<List<Room>> getRoomByState(@PathVariable RoomState roomState) {
         return ResponseEntity.ok(roomService.getRoomsByState(roomState));
     }

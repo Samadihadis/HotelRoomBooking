@@ -1,5 +1,6 @@
 package com.samadihadis.hotelroombooking.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.samadihadis.hotelroombooking.enumes.BookingState;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -44,5 +45,6 @@ public class Booking {
     private Room room;
 
     @OneToOne(mappedBy = "booking")
+    @JsonIgnore
     private Payment payment;
 }

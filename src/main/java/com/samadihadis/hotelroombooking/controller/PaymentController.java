@@ -43,12 +43,12 @@ public class PaymentController {
         );
     }
 
-    @GetMapping("/state/{state}")
+    @GetMapping("/state/{paymentState}")
     public ResponseEntity<List<Payment>> getPaymentByState(@PathVariable PaymentState paymentState) {
         return ResponseEntity.ok(paymentService.getPaymentByState(paymentState));
     }
 
-    @GetMapping("/method/{method}")
+    @GetMapping("/method/{paymentMethod}")
     public ResponseEntity<List<Payment>> getPaymentByMethod(@PathVariable PaymentMethod paymentMethod) {
         return ResponseEntity.ok(paymentService.getPaymentByMethod(paymentMethod));
     }

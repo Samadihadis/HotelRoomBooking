@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @GetMapping("/state")
-    public ResponseEntity<List<User>> getUserByState(@PathVariable UserState userState) {
+    public ResponseEntity<List<User>> getUserByState(@RequestParam UserState userState) {
         return ResponseEntity.ok(userService.getUsersByState(userState));
     }
 
@@ -55,13 +55,13 @@ public class UserController {
 
     @PatchMapping("/{id}/state")
     public ResponseEntity<User> changeUserState(@PathVariable Long id,
-                                                @PathVariable UserState userState) {
+                                                @RequestParam UserState userState) {
         return ResponseEntity.ok(userService.changeUserState(id, userState));
     }
 
     @PatchMapping("/{id}/role")
     public ResponseEntity<User> changeUserRole(@PathVariable Long id,
-                                               @PathVariable UserRole userRole) {
+                                               @RequestParam UserRole userRole) {
         return ResponseEntity.ok(userService.changeUserRole(id, userRole));
     }
 

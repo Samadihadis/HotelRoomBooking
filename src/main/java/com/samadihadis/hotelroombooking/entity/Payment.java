@@ -1,6 +1,7 @@
 package com.samadihadis.hotelroombooking.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.samadihadis.hotelroombooking.enumes.PaymentMethod;
 import com.samadihadis.hotelroombooking.enumes.PaymentState;
 import jakarta.persistence.*;
@@ -40,5 +41,6 @@ public class Payment {
     private String trackingCode;
 
     @OneToOne
+    @JsonIgnore
     private Booking booking;
 }

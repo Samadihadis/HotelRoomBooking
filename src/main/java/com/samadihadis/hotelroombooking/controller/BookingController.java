@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/booking")
+@RequestMapping("/api/bookings")
 public class BookingController {
 
     private final BookingService bookingService;
@@ -42,7 +42,7 @@ public class BookingController {
         );
     }
 
-    @GetMapping("/state/{state}")
+    @GetMapping("/state/{bookingState}")
     public ResponseEntity<List<Booking>> getBookingsByState(@PathVariable BookingState bookingState){
         return ResponseEntity.ok(bookingService.findBookingsByState(bookingState));
     }
@@ -76,7 +76,7 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.cancelBooking(id));
     }
 
-    @GetMapping("/checkin/{id}")
+    @PatchMapping("/{id}/checkin")
     public ResponseEntity<Booking> checkIn(@PathVariable Long id){
         return ResponseEntity.ok(bookingService.checkIn(id));
     }

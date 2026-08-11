@@ -1,5 +1,6 @@
 package com.samadihadis.hotelroombooking.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import lombok.AllArgsConstructor;
@@ -31,6 +32,7 @@ public class Hotel {
     private Integer starRating;
 
     @OneToMany(mappedBy = "hotel")
+    @JsonIgnore
     private List<Room> rooms;
 
 }

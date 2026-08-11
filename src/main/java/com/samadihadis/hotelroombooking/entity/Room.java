@@ -1,6 +1,7 @@
 package com.samadihadis.hotelroombooking.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.samadihadis.hotelroombooking.enumes.RoomState;
 import com.samadihadis.hotelroombooking.enumes.RoomType;
 import jakarta.persistence.*;
@@ -45,6 +46,7 @@ public class Room {
     private Hotel hotel;
 
     @OneToMany(mappedBy = "room")
+    @JsonIgnore
     private List<Booking> bookings;
 
 }

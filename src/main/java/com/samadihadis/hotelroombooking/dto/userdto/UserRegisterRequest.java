@@ -1,4 +1,4 @@
-package com.samadihadis.hotelroombooking.dto;
+package com.samadihadis.hotelroombooking.dto.userdto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

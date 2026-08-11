@@ -1,7 +1,7 @@
 package com.samadihadis.hotelroombooking.service;
 
-import com.samadihadis.hotelroombooking.dto.BookingCreateRequest;
-import com.samadihadis.hotelroombooking.dto.BookingResponse;
+import com.samadihadis.hotelroombooking.dto.bookingdto.BookingCreateRequest;
+import com.samadihadis.hotelroombooking.dto.bookingdto.BookingResponse;
 import com.samadihadis.hotelroombooking.entity.Booking;
 import com.samadihadis.hotelroombooking.entity.Room;
 import com.samadihadis.hotelroombooking.entity.User;

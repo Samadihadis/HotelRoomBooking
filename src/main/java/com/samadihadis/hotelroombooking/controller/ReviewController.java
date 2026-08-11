@@ -1,8 +1,8 @@
 package com.samadihadis.hotelroombooking.controller;
 
-import com.samadihadis.hotelroombooking.dto.ReviewCreateRequest;
-import com.samadihadis.hotelroombooking.dto.ReviewResponse;
-import com.samadihadis.hotelroombooking.dto.ReviewUpdateRequest;
+import com.samadihadis.hotelroombooking.dto.reviewdto.ReviewCreateRequest;
+import com.samadihadis.hotelroombooking.dto.reviewdto.ReviewResponse;
+import com.samadihadis.hotelroombooking.dto.reviewdto.ReviewUpdateRequest;
 import com.samadihadis.hotelroombooking.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

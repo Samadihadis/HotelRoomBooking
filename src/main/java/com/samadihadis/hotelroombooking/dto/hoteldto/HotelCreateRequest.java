@@ -1,7 +1,8 @@
-package com.samadihadis.hotelroombooking.dto;
+package com.samadihadis.hotelroombooking.dto.hoteldto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,10 +12,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class HotelUpdateRequest {
+public class HotelCreateRequest {
 
+    @NotBlank(message = "نام هتل نمی‌تواند خالی باشد.")
     private String name;
+
     private String address;
+
     private String description;
 
     @Min(value = 0, message = "امتیاز نمی‌تواند منفی باشد.")

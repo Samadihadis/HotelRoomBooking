@@ -1,4 +1,4 @@
-package com.samadihadis.hotelroombooking.dto;
+package com.samadihadis.hotelroombooking.dto.reviewdto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

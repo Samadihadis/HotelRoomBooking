@@ -1,11 +1,10 @@
 package com.samadihadis.hotelroombooking.mapper;
 
-import com.samadihadis.hotelroombooking.dto.BookingCreateRequest;
-import com.samadihadis.hotelroombooking.dto.BookingResponse;
-import com.samadihadis.hotelroombooking.dto.BookingUpdateRequest;
+import com.samadihadis.hotelroombooking.dto.bookingdto.BookingCreateRequest;
+import com.samadihadis.hotelroombooking.dto.bookingdto.BookingResponse;
+import com.samadihadis.hotelroombooking.dto.bookingdto.BookingUpdateRequest;
 import com.samadihadis.hotelroombooking.entity.Booking;
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

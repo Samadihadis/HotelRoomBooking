@@ -1,7 +1,7 @@
 package com.samadihadis.hotelroombooking.controller;
 
-import com.samadihadis.hotelroombooking.dto.BookingCreateRequest;
-import com.samadihadis.hotelroombooking.dto.BookingResponse;
+import com.samadihadis.hotelroombooking.dto.bookingdto.BookingCreateRequest;
+import com.samadihadis.hotelroombooking.dto.bookingdto.BookingResponse;
 import com.samadihadis.hotelroombooking.enumes.BookingState;
 import com.samadihadis.hotelroombooking.service.BookingService;
 import jakarta.validation.Valid;

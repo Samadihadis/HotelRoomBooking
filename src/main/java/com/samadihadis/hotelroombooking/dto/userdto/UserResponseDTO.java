@@ -1,4 +1,4 @@
-package com.samadihadis.hotelroombooking.dto;
+package com.samadihadis.hotelroombooking.dto.userdto;
 
 import com.samadihadis.hotelroombooking.enumes.UserRole;
 import com.samadihadis.hotelroombooking.enumes.UserState;

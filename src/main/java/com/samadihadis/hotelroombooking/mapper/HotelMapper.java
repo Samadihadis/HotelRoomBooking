@@ -1,9 +1,9 @@
 package com.samadihadis.hotelroombooking.mapper;
 
 
-import com.samadihadis.hotelroombooking.dto.HotelCreateRequest;
-import com.samadihadis.hotelroombooking.dto.HotelResponse;
-import com.samadihadis.hotelroombooking.dto.HotelUpdateRequest;
+import com.samadihadis.hotelroombooking.dto.hoteldto.HotelCreateRequest;
+import com.samadihadis.hotelroombooking.dto.hoteldto.HotelResponse;
+import com.samadihadis.hotelroombooking.dto.hoteldto.HotelUpdateRequest;
 import com.samadihadis.hotelroombooking.entity.Hotel;
 import org.mapstruct.*;
 

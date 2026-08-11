@@ -1,4 +1,4 @@
-package com.samadihadis.hotelroombooking.dto;
+package com.samadihadis.hotelroombooking.dto.bookingdto;
 
 import com.samadihadis.hotelroombooking.enumes.BookingState;
 import lombok.AllArgsConstructor;

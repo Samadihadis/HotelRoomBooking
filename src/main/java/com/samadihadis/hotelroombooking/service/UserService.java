@@ -1,8 +1,8 @@
 package com.samadihadis.hotelroombooking.service;
 
-import com.samadihadis.hotelroombooking.dto.UserRegisterRequest;
-import com.samadihadis.hotelroombooking.dto.UserResponseDTO;
-import com.samadihadis.hotelroombooking.dto.UserUpdateRequestDTO;
+import com.samadihadis.hotelroombooking.dto.userdto.UserRegisterRequest;
+import com.samadihadis.hotelroombooking.dto.userdto.UserResponseDTO;
+import com.samadihadis.hotelroombooking.dto.userdto.UserUpdateRequestDTO;
 import com.samadihadis.hotelroombooking.entity.User;
 import com.samadihadis.hotelroombooking.enumes.UserRole;
 import com.samadihadis.hotelroombooking.enumes.UserState;

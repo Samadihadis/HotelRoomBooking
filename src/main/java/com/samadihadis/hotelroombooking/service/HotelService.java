@@ -1,10 +1,14 @@
 package com.samadihadis.hotelroombooking.service;
 
+import com.samadihadis.hotelroombooking.dto.HotelCreateRequest;
+import com.samadihadis.hotelroombooking.dto.HotelResponse;
+import com.samadihadis.hotelroombooking.dto.HotelUpdateRequest;
 import com.samadihadis.hotelroombooking.entity.Hotel;
+import com.samadihadis.hotelroombooking.mapper.HotelMapper;
 import com.samadihadis.hotelroombooking.repository.HotelRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -13,52 +17,72 @@ import java.util.List;
 public class HotelService {
 
     private final HotelRepository hotelRepository;
+    private final HotelMapper hotelMapper;
 
     @Transactional
-    public Hotel createHotel(Hotel hotel) {
-
-        List<Hotel> existingHotels = hotelRepository.findHotelsByNameContainingIgnoreCase(hotel.getName());
+    public HotelResponse createHotel(HotelCreateRequest request) {
+        List<Hotel> existingHotels = hotelRepository.findHotelsByNameContainingIgnoreCase(request.getName());
 
         if (!existingHotels.isEmpty()) {
             throw new RuntimeException("هتلی با این نام قبلاً ثبت شده است.");
         }
 
-        return hotelRepository.save(hotel);
+        Hotel hotel = hotelMapper.toEntity(request);
+        Hotel saved = hotelRepository.save(hotel);
+        return hotelMapper.toResponse(saved);
     }
 
-    public List<Hotel> getAllHotels() {
-        return hotelRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<HotelResponse> getAllHotels() {
+        return hotelRepository.findAll()
+                .stream()
+                .map(hotelMapper::toResponse)
+                .toList();
     }
 
-    public Hotel getHotelById(Long id) {
-        return hotelRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(
-                        String.format("هتل با شناسه %d یافت نشد.", id)
-                ));
+    @Transactional(readOnly = true)
+    public HotelResponse getHotelById(Long id) {
+        return hotelMapper.toResponse(findHotelEntityById(id));
     }
 
-    public List<Hotel> getHotelsByRate(Integer rate) {
-        return hotelRepository.findHotelsByRate(rate);
+    @Transactional(readOnly = true)
+    public List<HotelResponse> getHotelsByRate(Integer rate) {
+        return hotelRepository.findHotelsByRate(rate)
+                .stream()
+                .map(hotelMapper::toResponse)
+                .toList();
     }
 
-    public List<Hotel> getHotelsByStarRating(Integer starRating) {
-        return hotelRepository.findHotelsByStarRating(starRating);
+    @Transactional(readOnly = true)
+    public List<HotelResponse> getHotelsByStarRating(Integer starRating) {
+        return hotelRepository.findHotelsByStarRating(starRating)
+                .stream()
+                .map(hotelMapper::toResponse)
+                .toList();
     }
 
-    public List<Hotel> getHotelsByNameContainingIgnoreCase(String name){
+    @Transactional(readOnly = true)
+    public List<HotelResponse> getHotelsByNameContainingIgnoreCase(String name) {
         if (name == null || name.trim().isEmpty()) {
             throw new RuntimeException("نام هتل نمی‌تواند خالی باشد.");
         }
-        return hotelRepository.findHotelsByNameContainingIgnoreCase(name);
+        return hotelRepository.findHotelsByNameContainingIgnoreCase(name)
+                .stream()
+                .map(hotelMapper::toResponse)
+                .toList();
     }
 
-    public List<Hotel> getHotelsByStarRatingAndRateGreaterThanEqual(Integer starRating, Integer rate) {
-        return hotelRepository.findHotelsByStarRatingAndRateGreaterThanEqual(starRating, rate);
+    @Transactional(readOnly = true)
+    public List<HotelResponse> getHotelsByStarRatingAndRateGreaterThanEqual(Integer starRating, Integer rate) {
+        return hotelRepository.findHotelsByStarRatingAndRateGreaterThanEqual(starRating, rate)
+                .stream()
+                .map(hotelMapper::toResponse)
+                .toList();
     }
 
     @Transactional
     public void deleteHotel(Long id) {
-        Hotel hotel = getHotelById(id);
+        Hotel hotel = findHotelEntityById(id);
 
         if (hotel.getRooms() != null && !hotel.getRooms().isEmpty()) {
             throw new RuntimeException("هتل دارای اتاق است و نمی‌توان آن را حذف کرد.");
@@ -67,23 +91,26 @@ public class HotelService {
     }
 
     @Transactional
-    public Hotel updateHotel(Long id, Hotel updatedHotel) {
-        Hotel existingHotel = getHotelById(id);
+    public HotelResponse updateHotel(Long id, HotelUpdateRequest request) {
+        Hotel existingHotel = findHotelEntityById(id);
 
-        if (!existingHotel.getName().equals(updatedHotel.getName())) {
+        if (request.getName() != null && !existingHotel.getName().equals(request.getName())) {
             List<Hotel> duplicateCheck = hotelRepository
-                    .findHotelsByNameContainingIgnoreCase(updatedHotel.getName());
+                    .findHotelsByNameContainingIgnoreCase(request.getName());
             if (!duplicateCheck.isEmpty()) {
                 throw new RuntimeException("هتلی با این نام قبلاً ثبت شده است.");
             }
         }
 
-        existingHotel.setName(updatedHotel.getName());
-        existingHotel.setAddress(updatedHotel.getAddress());
-        existingHotel.setDescription(updatedHotel.getDescription());
-        existingHotel.setRate(updatedHotel.getRate());
-        existingHotel.setStarRating(updatedHotel.getStarRating());
+        hotelMapper.updateEntityFromRequest(request, existingHotel);
+        Hotel updated = hotelRepository.save(existingHotel);
+        return hotelMapper.toResponse(updated);
+    }
 
-        return hotelRepository.save(existingHotel);
+    private Hotel findHotelEntityById(Long id) {
+        return hotelRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(
+                        String.format("هتل با شناسه %d یافت نشد.", id)
+                ));
     }
 }
